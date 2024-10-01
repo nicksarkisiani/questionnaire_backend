@@ -4,20 +4,21 @@ import {Repository} from "typeorm";
 import {User} from "./user.entity";
 import {registrationDto} from "../auth/dto/registration.dto";
 import {encodePassword} from "./utils/bcrypt";
+import {RoleService} from "../role/role.service";
 
 @Injectable()
 export class UserService {
 
-    constructor(@InjectRepository(User) private userRepository: Repository<User> ) {
+    constructor(@InjectRepository(User) private userRepository: Repository<User>, private readonly roleService: RoleService ) {
     }
 
     async createUser(dto: registrationDto) {
         await this.checkExisting(dto.email, dto.username)
         const hashPassword = encodePassword(dto.password)
-        const user = this.userRepository.create({...dto, password: hashPassword})
+        let user = this.userRepository.create({...dto, password: hashPassword})
+        user = await this.roleService.giveUserRole(user)
         await this.userRepository.save(user)
         return user;
-
     }
 
     async findUserByEmail(email: string): Promise<User> {
