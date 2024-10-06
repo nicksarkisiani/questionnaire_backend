@@ -42,13 +42,15 @@ export class AuthController {
         res.cookie("accessToken", accessToken, {
             httpOnly: true,
             secure: !!process.env.SECURE,
-            maxAge: 15 * 60 * 1000
+            maxAge: 15 * 60 * 1000,
+            sameSite: "none"
         });
 
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
             secure: !!process.env.SECURE,
-            maxAge: 1000 * 60 * 60 * 24 * 7
+            maxAge: 1000 * 60 * 60 * 24 * 7,
+            sameSite: "none"
         })
 
         res.send({message})
