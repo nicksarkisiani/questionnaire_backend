@@ -41,14 +41,14 @@ export class AuthController {
     setCookies(res: Response, accessToken: string, refreshToken: string, message) {
         res.cookie("accessToken", accessToken, {
             httpOnly: true,
-            secure: !!process.env.SECURE,
+            secure: !!+process.env.SECURE,
             maxAge: 15 * 60 * 1000,
             sameSite: "none"
         });
 
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
-            secure: !!process.env.SECURE,
+            secure: !!+process.env.SECURE,
             maxAge: 1000 * 60 * 60 * 24 * 7,
             sameSite: "none"
         })
