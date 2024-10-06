@@ -4,6 +4,7 @@ import {registrationDto} from "./dto/registration.dto";
 import {AuthGuard} from "@nestjs/passport";
 import {Response} from "express";
 import {JwtAuthGuard} from "./jwt-auth.guard";
+import * as process from "node:process";
 
 
 @Controller('auth')
@@ -40,13 +41,13 @@ export class AuthController {
     setCookies(res: Response, accessToken: string, refreshToken: string, message) {
         res.cookie("accessToken", accessToken, {
             httpOnly: true,
-            secure: true,
+            secure: !!process.env.SECURE,
             maxAge: 15 * 60 * 1000
         });
 
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
-            secure: true,
+            secure: !!process.env.SECURE,
             maxAge: 1000 * 60 * 60 * 24 * 7
         })
 
