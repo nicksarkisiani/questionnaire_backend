@@ -52,9 +52,6 @@ export class AuthController {
 
 
     setCookies(res: Response, accessToken: string, refreshToken: string, message: string) {
-        const api = process.env.API_URL
-        console.log(api)
-
         res.cookie("accessToken", accessToken, {
             httpOnly: true,
             secure: !!+process.env.SECURE,
@@ -70,15 +67,6 @@ export class AuthController {
             maxAge: 1000 * 60 * 60 * 24 * 7,
             sameSite: "none",
             domain: process.env.API_URL,
-            path: "/"
-        })
-
-        res.cookie("refreshToken", refreshToken, {
-            httpOnly: true,
-            secure: !!+process.env.SECURE,
-            maxAge: 1000 * 60 * 60 * 24 * 7,
-            sameSite: "none",
-            domain: `${api}`,
             path: "/"
         })
 
