@@ -37,6 +37,19 @@ export class AuthController {
         this.setCookies(res, tokens.accessToken, tokens.refreshToken, "Refresh successfully");
     }
 
+    @Post("/logout")
+    async logout(@Request() req, @Res() res: Response) {
+        const refreshToken = req.cookies["refreshToken"];
+        const accessToken = req.cookies["accessToken"];
+        if(!refreshToken || !accessToken){
+            throw new UnauthorizedException("User isn't logged in");
+        }
+        res.clearCookie('accessToken');
+        res.clearCookie('refreshToken');
+        res.send({message: 'Logged out successfully'});
+
+    }
+
 
     setCookies(res: Response, accessToken: string, refreshToken: string, message) {
         res.cookie("accessToken", accessToken, {
