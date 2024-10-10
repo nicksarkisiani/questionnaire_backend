@@ -52,7 +52,8 @@ export class AuthController {
 
 
     setCookies(res: Response, accessToken: string, refreshToken: string, message: string) {
-        console.log(process.env.API_URL)
+        const api = process.env.API_URL
+        console.log(api)
 
         res.cookie("accessToken", accessToken, {
             httpOnly: true,
@@ -74,19 +75,10 @@ export class AuthController {
 
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
-            secure: true,
+            secure: !!+process.env.SECURE,
             maxAge: 1000 * 60 * 60 * 24 * 7,
             sameSite: "none",
-            domain: "questionnaire-backend-461z.onrender.com",
-            path: "/"
-        })
-
-        res.cookie("refreshToken", refreshToken, {
-            httpOnly: true,
-            secure: true,
-            maxAge: 1000 * 60 * 60 * 24 * 7,
-            sameSite: "none",
-            domain: ".onrender.com",
+            domain: `${api}`,
             path: "/"
         })
 
