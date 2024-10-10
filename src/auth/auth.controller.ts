@@ -44,26 +44,31 @@ export class AuthController {
         if(!refreshToken || !accessToken){
             throw new UnauthorizedException("User isn't logged in");
         }
-        res.clearCookie('accessToken');
-        res.clearCookie('refreshToken');
+        res.clearCookie('accessToken', {domain: process.env.API_URL, path: "/"});
+        res.clearCookie('refreshToken', {domain: process.env.API_URL, path: "/"});
         res.send({message: 'Logged out successfully'});
 
     }
 
 
     setCookies(res: Response, accessToken: string, refreshToken: string, message) {
+        console.log(process.env.API_URL)
         res.cookie("accessToken", accessToken, {
             httpOnly: true,
             secure: !!+process.env.SECURE,
             maxAge: 15 * 60 * 1000,
-            sameSite: "none"
+            sameSite: "none",
+            domain: process.env.API_URL,
+            path: "/"
         });
 
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
             secure: !!+process.env.SECURE,
             maxAge: 1000 * 60 * 60 * 24 * 7,
-            sameSite: "none"
+            sameSite: "none",
+            domain: process.env.API_URL,
+            path: "/"
         })
 
         res.send({message})
@@ -75,4 +80,5 @@ export class AuthController {
         return "123"
     }
 }
+
 
