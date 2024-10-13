@@ -9,6 +9,10 @@ import { RoleModule } from './role/role.module';
 import * as process from "node:process";
 import {User} from "./user/user.entity";
 import {Role} from "./role/role.entity";
+import { TemplateModule } from './template/template.module';
+import { QuestionsModule } from './questions/questions.module';
+import {Template} from "./template/template.entity";
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
     imports: [
@@ -22,11 +26,11 @@ import {Role} from "./role/role.entity";
             port: +process.env.DB_PORT,
             password: process.env.DB_PASSWORD,
             username: process.env.DB_USERNAME,
-            entities: [User, Role],
+            entities: [User, Role, Template],
             synchronize: true,
             database: process.env.DB_NAME,
             ssl: !!+process.env.DB_SSL
-        }), AuthModule, UserModule, RoleModule,
+        }), AuthModule, UserModule, RoleModule, TemplateModule, QuestionsModule, CloudinaryModule,
     ],
     controllers: [AppController],
     providers: [AppService],
