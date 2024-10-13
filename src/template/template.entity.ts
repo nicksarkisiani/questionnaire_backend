@@ -1,6 +1,7 @@
-import {Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
+import {Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn} from "typeorm";
 import {User} from "../user/user.entity";
 import {Tag} from "../tag/tag.entity";
+import {Question} from "../questions/questions.entity";
 
 
 @Entity()
@@ -30,6 +31,10 @@ export class Template {
     @ManyToOne(() => User)
     @JoinColumn({name: 'user_id'})
     author: User
+
+    @OneToMany(() => Question, question => question.template_id, {cascade: true})
+    @JoinColumn({name: 'question_id'})
+    questions: Question[]
 
     @CreateDateColumn()
     created_at: Date;

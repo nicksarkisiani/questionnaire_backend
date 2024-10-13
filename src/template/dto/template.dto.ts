@@ -1,6 +1,4 @@
-
-
-export class TemplateDto {
+export default class TemplateDto {
     title: string
     description: string
     topic: string

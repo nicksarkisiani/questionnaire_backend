@@ -15,6 +15,9 @@ import {Template} from "./template/template.entity";
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { TagModule } from './tag/tag.module';
 import {Tag} from "./tag/tag.entity";
+import { QuestionTypeModule } from './question-type/question-type.module';
+import {Question} from "./questions/questions.entity";
+import {QuestionType} from "./question-type/question-type.entity";
 
 @Module({
     imports: [
@@ -28,11 +31,11 @@ import {Tag} from "./tag/tag.entity";
             port: +process.env.DB_PORT,
             password: process.env.DB_PASSWORD,
             username: process.env.DB_USERNAME,
-            entities: [User, Role, Template, Tag],
+            entities: [User, Role, Template, Tag, Question, QuestionType],
             synchronize: true,
             database: process.env.DB_NAME,
             ssl: !!+process.env.DB_SSL
-        }), AuthModule, UserModule, RoleModule, TemplateModule, QuestionsModule, CloudinaryModule, TagModule,
+        }), AuthModule, UserModule, RoleModule, TemplateModule, QuestionsModule, CloudinaryModule, TagModule, QuestionTypeModule,
     ],
     controllers: [AppController],
     providers: [AppService],
