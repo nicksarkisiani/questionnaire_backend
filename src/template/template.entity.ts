@@ -1,5 +1,6 @@
 import {Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
 import {User} from "../user/user.entity";
+import {Tag} from "../tag/tag.entity";
 
 
 @Entity()
@@ -7,16 +8,20 @@ export class Template {
     @PrimaryGeneratedColumn()
     id: number
 
-    @Column({unique: false, nullable: false, type: "varchar"})
+    @Column({unique: false, nullable: false, type: "text"})
     title: string
 
-    @Column({unique: false, nullable: false, type: "varchar"})
+    @Column({unique: false, nullable: false, type: "text"})
     description: string
 
-    @Column({unique: false, nullable: false, type: "varchar"})
+    @Column({unique: false, nullable: false, type: "text"})
     topic: string
 
-    @Column({unique: false, nullable: true, type: "varchar"})
+    @ManyToOne(() => Tag)
+    @JoinColumn({name: 'tag_id'})
+    tag: Tag;
+
+    @Column({unique: false, nullable: true, type: "text"})
     imageURL: string
 
     @Column({unique: false, nullable: false, type: "boolean"})
