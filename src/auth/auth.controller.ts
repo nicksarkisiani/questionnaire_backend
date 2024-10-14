@@ -5,6 +5,7 @@ import {AuthGuard} from "@nestjs/passport";
 import {Response} from "express";
 import {JwtAuthGuard} from "./jwt-auth.guard";
 import * as process from "node:process";
+import {ApiBody} from "@nestjs/swagger";
 
 
 @Controller('auth')
@@ -13,6 +14,7 @@ export class AuthController {
     constructor(
         private readonly authService: AuthService,
     ) {}
+
 
     @Post("/registration")
     async registration(@Body() dto: registrationDto, @Res() res: Response): Promise<any> {
