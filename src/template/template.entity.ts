@@ -29,7 +29,7 @@ export class Template {
     isPublic: boolean
 
     @ManyToOne(() => User)
-    @JoinColumn({name: 'user_id'})
+    @JoinColumn({name: 'author_id'})
     author: User
 
     @OneToMany(() => Question, question => question.template_id, {cascade: true})
