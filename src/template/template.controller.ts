@@ -26,7 +26,7 @@ export class TemplateController {
     @UseGuards(JwtAuthGuard)
     @Post("/create")
     @UseInterceptors(FileInterceptor('file'))
-    async createTemplate(@Request() req,@UploadedFile() file: Express.Multer.File, @Body() dto: TemplateDto) {
+    async createTemplate(@Request() req, @UploadedFile() file: Express.Multer.File, @Body() dto: TemplateDto) {
         return await this.templateService.createTemplate(dto, file, req.user)
     }
 
@@ -37,9 +37,22 @@ export class TemplateController {
     }
 
     @UseGuards(JwtAuthGuard)
+    @Get("/")
+    async getTemplates(@Request() req) {
+        return await this.templateService.getAllTemplates(req.user)
+    }
+
+    @UseGuards(JwtAuthGuard)
     @Patch("/:id")
     async patchInformation(@Param('id') id: number, @Request() req, @Body() dto: UpdateTemplateDto) {
         return await this.templateService.patchInformation(id, req.user, dto)
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Patch("/image/:id")
+    @UseInterceptors(FileInterceptor('file'))
+    async patchImage(@Param('id') id: number, @Request() req, @UploadedFile() file: Express.Multer.File) {
+        return await this.templateService.patchImage(id, req.user, file)
     }
 
     @UseGuards(JwtAuthGuard)

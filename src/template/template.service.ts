@@ -1,4 +1,10 @@
-import {BadRequestException, ForbiddenException, Injectable, NotFoundException} from '@nestjs/common';
+import {
+    BadRequestException,
+    ForbiddenException,
+    Injectable,
+    NotFoundException,
+    UnauthorizedException
+} from '@nestjs/common';
 import {CloudinaryService} from "../cloudinary/cloudinary.service";
 import TemplateDto, {UpdateTemplateDto} from "./dto/template.dto";
 import {Repository} from "typeorm";
@@ -93,7 +99,10 @@ export class TemplateService {
         if(template.author.id !== user.id) {
             throw new ForbiddenException(`You don't have permission`)
         }
-        return template
+        return {
+            ...template,
+            author: user
+        }
     }
 
     async patchInformation(id: number, user: User, updateDto: UpdateTemplateDto) {
@@ -101,6 +110,24 @@ export class TemplateService {
         Object.assign(template, updateDto)
         await this.templateRepository.save(template)
         return template
+    }
+
+    async patchImage(id: number, user: User, file: Express.Multer.File) {
+        const template = await this.checkExistingAndPermission(id, user)
+        if(file) {
+            template.imageURL = await this.uploadImageToCloudinary(file)
+        }
+        await this.templateRepository.save(template)
+        return template
+    }
+
+    async getAllTemplates(candidate: User) {
+        const user = await this.userService.findUserById(candidate.id)
+        if(!user) {
+            throw new NotFoundException("User is not found")
+        }
+        const templates = await this.templateRepository.findBy({author: user})
+        return templates
     }
 }
 
