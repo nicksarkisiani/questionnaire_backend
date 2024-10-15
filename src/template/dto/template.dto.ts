@@ -1,4 +1,4 @@
-import {ApiProperty} from "@nestjs/swagger";
+import {ApiProperty, PartialType} from "@nestjs/swagger";
 
 export default class TemplateDto {
     @ApiProperty({example: "questionnaire", description: "Title" })
@@ -12,3 +12,6 @@ export default class TemplateDto {
     @ApiProperty({example: "4", description: "Id of tag" })
     tag_id: number
 }
+
+
+export class UpdateTemplateDto extends PartialType(TemplateDto) {}

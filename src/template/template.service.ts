@@ -1,6 +1,6 @@
-import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
+import {BadRequestException, ForbiddenException, Injectable, NotFoundException} from '@nestjs/common';
 import {CloudinaryService} from "../cloudinary/cloudinary.service";
-import TemplateDto from "./dto/template.dto";
+import TemplateDto, {UpdateTemplateDto} from "./dto/template.dto";
 import {Repository} from "typeorm";
 import {Template} from "./template.entity";
 import {InjectRepository} from "@nestjs/typeorm";
@@ -33,7 +33,7 @@ export class TemplateService {
             if(file) {
                 imagePath = await this.uploadImageToCloudinary(file)
             }
-            template = await this.tagService.attachTag(template, dto.tag_id)
+            if(dto.tag_id) template = await this.tagService.attachTag(template, dto.tag_id)
             if(!dto.isPublic) template.isPublic = true
             template.imageURL = imagePath
             template.author = await this.userService.findUserById(reqUser.id)
@@ -72,6 +72,35 @@ export class TemplateService {
             throw new NotFoundException(`Template ${id} isn't exists`)
         }
         return await this.questionService.findAllQuestions(id)
+    }
+
+    async getTemplate(id: number, user: User) {
+       const template = await this.checkExistingAndPermission(id, user)
+        return {
+            ...template,
+            author: user
+        }
+    }
+
+    async checkExistingAndPermission(id: number, user: User) {
+        const template = await this.templateRepository.findOne({
+            where: {id},
+            relations: ["author"]
+        })
+        if(!template) {
+            throw new NotFoundException(`Template ${id} isn't exists`)
+        }
+        if(template.author.id !== user.id) {
+            throw new ForbiddenException(`You don't have permission`)
+        }
+        return template
+    }
+
+    async patchInformation(id: number, user: User, updateDto: UpdateTemplateDto) {
+        const template = await this.checkExistingAndPermission(id, user)
+        Object.assign(template, updateDto)
+        await this.templateRepository.save(template)
+        return template
     }
 }
 
