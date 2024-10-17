@@ -3,28 +3,26 @@ import {
     ForbiddenException,
     Injectable,
     NotFoundException,
-    UnauthorizedException
 } from '@nestjs/common';
 import {CloudinaryService} from "../cloudinary/cloudinary.service";
-import TemplateDto, {UpdateTemplateDto} from "./dto/template.dto";
+import {UpdateTemplateDto} from "./dto/template.dto";
 import {Repository} from "typeorm";
 import {Template} from "./template.entity";
 import {InjectRepository} from "@nestjs/typeorm";
-import {TagService} from "../tag/tag.service";
-import QuestionsDto from "../questions/dto/questions.dto";
+import {User} from "../users/user.entity";
+import {UsersService} from "../users/users.service";
+import {QuestionDto} from "../questions/dto/question.dto";
 import {QuestionsService} from "../questions/questions.service";
-import {User} from "../user/user.entity";
-import {UserService} from "../user/user.service";
 
 @Injectable()
-export class TemplateService {
+export class TemplatesService {
 
     constructor(private readonly cloudinary: CloudinaryService,
                 @InjectRepository(Template) private readonly templateRepository: Repository<Template>,
-                private readonly tagService: TagService,
-                private readonly questionService: QuestionsService,
-                private readonly  userService: UserService,
+                private readonly  userService: UsersService,
+                private readonly questionsService: QuestionsService,
     ) {}
+
     async uploadImageToCloudinary(file: Express.Multer.File) {
         const data =  await this.cloudinary.uploadFile(file).catch(() => {
             throw new BadRequestException('Invalid file type.');
@@ -32,52 +30,9 @@ export class TemplateService {
         return data.url
     }
 
-    async createTemplate(dto: TemplateDto, file: Express.Multer.File, reqUser: User): Promise<Template> {
-        try {
-            let template = this.templateRepository.create(dto)
-            let imagePath: string | null = null
-            if(file) {
-                imagePath = await this.uploadImageToCloudinary(file)
-            }
-            if(dto.tag_id) template = await this.tagService.attachTag(template, dto.tag_id)
-            if(!dto.isPublic) template.isPublic = true
-            template.imageURL = imagePath
-            template.author = await this.userService.findUserById(reqUser.id)
-            await this.templateRepository.save(template)
-            return {
-                ...template,
-                author: reqUser
-            }
-        } catch (e) {
-            throw new BadRequestException(e.detail)
-        }
-
-    }
 
     async findById(id: number) {
         return await this.templateRepository.findOneBy({id})
-    }
-
-    async addQuestionsToTemplate(id: number, dto: QuestionsDto) {
-        try {
-            const template = await this.findById(id)
-            if(!template) {
-                throw new NotFoundException(`Template ${id} isn't exists`)
-            }
-            template.questions =  await this.questionService.createQuestions(template, dto)
-            return template
-        } catch (e) {
-            throw new BadRequestException(e.detail)
-        }
-
-    }
-
-    async getAllQuestions(id: number) {
-        const template = await this.findById(id)
-        if(!template) {
-            throw new NotFoundException(`Template ${id} isn't exists`)
-        }
-        return await this.questionService.findAllQuestions(id)
     }
 
     async getTemplate(id: number, user: User) {
@@ -91,11 +46,12 @@ export class TemplateService {
     async checkExistingAndPermission(id: number, user: User) {
         const template = await this.templateRepository.findOne({
             where: {id},
-            relations: ["author"]
+            relations: ["author", "tags", "topic"]
         })
         if(!template) {
             throw new NotFoundException(`Template ${id} isn't exists`)
         }
+        console.log(template, user )
         if(template.author.id !== user.id) {
             throw new ForbiddenException(`You don't have permission`)
         }
@@ -126,8 +82,28 @@ export class TemplateService {
         if(!user) {
             throw new NotFoundException("User is not found")
         }
-        const templates = await this.templateRepository.findBy({author: user})
-        return templates
+        return await this.templateRepository.findBy({author: user})
+    }
+
+    async createQuestion(user: User,templateId: number, questionDto: QuestionDto) {
+        const template = await this.checkExistingAndPermission(templateId, user)
+        template.question = await this. questionsService.updateQuestions(template.question, questionDto)
+        await this.templateRepository.save(template)
+        return template
+    }
+
+    async createEmptyTemplate(user: User) {
+        const template = this.templateRepository.create()
+        template.title = "Untitled"
+        template.description = "Description"
+        template.isPublic = false
+        template.question = await this.questionsService.initializeQuestionEntity()
+        template.author = await this.userService.findUserById(user.id)
+        await this.templateRepository.save(template)
+        return {
+            ...template,
+            author: user
+        }
     }
 }
 

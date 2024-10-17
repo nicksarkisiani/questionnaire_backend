@@ -4,12 +4,12 @@ import {Repository} from "typeorm";
 import {User} from "./user.entity";
 import {registrationDto} from "../auth/dto/registration.dto";
 import {encodePassword, encodeToken} from "../utils/bcrypt";
-import {RoleService} from "../role/role.service";
+import {RolesService} from "../role/roles.service";
 
 @Injectable()
-export class UserService {
+export class UsersService {
 
-    constructor(@InjectRepository(User) private userRepository: Repository<User>, private readonly roleService: RoleService ) {
+    constructor(@InjectRepository(User) private userRepository: Repository<User>, private readonly roleService: RolesService ) {
     }
 
     async createUser(dto: registrationDto) {

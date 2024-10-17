@@ -1,33 +1,29 @@
 import { Injectable } from '@nestjs/common';
+import {Question} from "./question.entity";
+import {QuestionDto} from "./dto/question.dto";
 import {InjectRepository} from "@nestjs/typeorm";
-import {Question} from "./questions.entity";
 import {Repository} from "typeorm";
-import QuestionsDto, {QuestionDto} from "./dto/questions.dto";
-import {Template} from "../template/template.entity";
-import {TagService} from "../tag/tag.service";
-import {QuestionTypeService} from "../question-type/question-type.service";
 
 @Injectable()
 export class QuestionsService {
 
-    constructor(@InjectRepository(Question) private readonly questionRepository: Repository<Question>,
-                private readonly questionTypeService: QuestionTypeService,) {
+    constructor(@InjectRepository(Question) private readonly questionRepository: Repository<Question>) {
     }
 
-    async createQuestion(questionDto: QuestionDto, template: Template){
-        const question = this.questionRepository.create(questionDto)
-        question.type = await this.questionTypeService.findById(questionDto.type_id)
-        question.template_id = template.id
-        await this.questionRepository.save(question)
-        return question
+    async updateQuestions(questionEntity: Question, questionDto: QuestionDto) {
+        const value = `custom_${questionDto.type}${questionDto.index}`
+        questionEntity[`${value}_question`] = questionDto.question
+        questionEntity[`${value}_state`] = questionDto.state
+        if(questionDto.type === "checkbox"){
+            questionEntity[`${value}_answers`] = questionDto.answers
+        }
+        await this.questionRepository.save(questionEntity)
+        return questionEntity
     }
 
-    async createQuestions(template: Template, dto: QuestionsDto){
-        const questions = dto.questions.map( async (question) => await this.createQuestion(question, template))
-        return await Promise.all(questions)
-    }
-
-    async findAllQuestions(template_id: number) {
-        return await this.questionRepository.findBy({template_id})
+    async initializeQuestionEntity ()  {
+        const questionEntity = this.questionRepository.create()
+        await this.questionRepository.save(questionEntity)
+        return questionEntity
     }
 }

@@ -1,15 +1,15 @@
 import {Injectable, UnauthorizedException} from '@nestjs/common';
 import {registrationDto} from "./dto/registration.dto";
-import {UserService} from "../user/user.service";
+import {UsersService} from "../users/users.service";
 import {comparePassword, compareToken} from "../utils/bcrypt";
 import {JwtService} from "@nestjs/jwt";
-import {User} from "../user/user.entity";
+import {User} from "../users/user.entity";
 import * as process from "node:process";
 
 @Injectable()
 export class AuthService {
 
-    constructor(private readonly userService: UserService, private readonly jwtService: JwtService) {
+    constructor(private readonly userService: UsersService, private readonly jwtService: JwtService) {
     }
 
     async registration(dto: registrationDto): Promise<any> {

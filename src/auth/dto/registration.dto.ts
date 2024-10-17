@@ -2,7 +2,7 @@ import {ApiProperty} from "@nestjs/swagger";
 
 
 export class registrationDto {
-    @ApiProperty({example: "user@gmail.com", description: "email" })
+    @ApiProperty({example: "users@gmail.com", description: "email" })
     email: string;
     @ApiProperty({example: "username", description: "username" })
     username: string;
@@ -11,7 +11,7 @@ export class registrationDto {
 }
 
 export class loginDto {
-    @ApiProperty({example: "user@gmail.com", description: "email" })
+    @ApiProperty({example: "users@gmail.com", description: "email" })
     email: string;
     @ApiProperty({example: "12345678", description: "password" })
     password: string;

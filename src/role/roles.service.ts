@@ -3,10 +3,10 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {Role} from "./role.entity";
 import {RoleDto} from "./dto/role.dto";
-import {User} from "../user/user.entity";
+import {User} from "../users/user.entity";
 
 @Injectable()
-export class RoleService {
+export class RolesService {
 
     constructor(@InjectRepository(Role) private readonly roleRepository: Repository<Role>) {
     }

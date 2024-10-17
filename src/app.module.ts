@@ -4,20 +4,19 @@ import {AppService} from './app.service';
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {ConfigModule} from "@nestjs/config";
 import { AuthModule } from './auth/auth.module';
-import { UserModule } from './user/user.module';
-import { RoleModule } from './role/role.module';
-import * as process from "node:process";
-import {User} from "./user/user.entity";
+import { UsersModule } from './users/users.module';
+import { RolesModule } from './role/roles.module';
+import {User} from "./users/user.entity";
 import {Role} from "./role/role.entity";
-import { TemplateModule } from './template/template.module';
-import { QuestionsModule } from './questions/questions.module';
-import {Template} from "./template/template.entity";
+import { TemplatesModule } from './templates/templates.module';
+import {Template} from "./templates/template.entity";
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
-import { TagModule } from './tag/tag.module';
-import {Tag} from "./tag/tag.entity";
-import { QuestionTypeModule } from './question-type/question-type.module';
-import {Question} from "./questions/questions.entity";
-import {QuestionType} from "./question-type/question-type.entity";
+import { TagsModule } from './tags/tags.module';
+import { TopicsModule } from './topics/topics.module';
+import { QuestionsModule } from './questions/questions.module';
+import Tag from "./tags/tag.entity";
+import Topic from "./topics/topic.entity";
+import {Question} from "./questions/question.entity";
 
 @Module({
     imports: [
@@ -31,11 +30,11 @@ import {QuestionType} from "./question-type/question-type.entity";
             port: +process.env.DB_PORT,
             password: process.env.DB_PASSWORD,
             username: process.env.DB_USERNAME,
-            entities: [User, Role, Template, Tag, Question, QuestionType],
+            entities: [User, Role, Template, Tag, Topic, Question],
             synchronize: true,
             database: process.env.DB_NAME,
             ssl: !!+process.env.DB_SSL
-        }), AuthModule, UserModule, RoleModule, TemplateModule, QuestionsModule, CloudinaryModule, TagModule, QuestionTypeModule,
+        }), AuthModule, UsersModule, RolesModule, TemplatesModule, CloudinaryModule, TagsModule, TopicsModule, QuestionsModule
     ],
     controllers: [AppController],
     providers: [AppService],
