@@ -5,7 +5,7 @@ import {
     JoinColumn,
     JoinTable,
     ManyToMany,
-    ManyToOne, OneToOne,
+    ManyToOne, OneToMany, OneToOne,
     PrimaryGeneratedColumn
 } from "typeorm";
 import {User} from "../users/user.entity";
@@ -18,24 +18,24 @@ export class Template {
     @PrimaryGeneratedColumn()
     id: number
 
-    @Column({unique: false, nullable: false})
+    @Column({unique: false, nullable: false, default: "Untitled"})
     title: string
 
-    @Column({unique: false, nullable: false, type: "text"})
+    @Column({unique: false, nullable: false, type: "text", default: "Description"})
     description: string
 
-    @ManyToOne(() => Topic, { eager: true })
-    @JoinColumn({ name: 'topic_id' })
+    @ManyToOne(() => Topic, {eager: true})
+    @JoinColumn({name: 'topic_id'})
     topic: Topic
 
-    @ManyToMany(() => Tag, (tag) => tag.templates, { eager: true })
-    @JoinTable({ name: 'template_tags' })
+    @ManyToMany(() => Tag, (tag) => tag.templates, {eager: true})
+    @JoinTable({name: 'template_tags'})
     tags: Tag[];
 
     @Column({unique: false, nullable: true})
     imageURL: string
 
-    @Column({unique: false, nullable: false, type: "boolean"})
+    @Column({unique: false, nullable: false, type: "boolean", default: false})
     isPublic: boolean
 
     @ManyToOne(() => User)
@@ -45,7 +45,18 @@ export class Template {
     @CreateDateColumn()
     created_at: Date;
 
-    @OneToOne(() => Question, question => question.template, {eager: true})
-    @JoinColumn({ name: 'question_id' })
-    question: Question
+    @Column({nullable: false, type: "int", default: 0})
+    intCount: number
+
+    @Column({nullable: false, type: "int", default: 0})
+    stringCount: number
+
+    @Column({nullable: false, type: "int", default: 0})
+    textCount: number
+
+    @Column({nullable: false, type: "int", default: 0})
+    checkboxCount: number
+
+    @OneToMany(() => Question, (question) => question.template)
+    questions: Question[];
 }

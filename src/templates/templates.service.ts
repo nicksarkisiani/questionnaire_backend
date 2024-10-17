@@ -11,7 +11,7 @@ import {Template} from "./template.entity";
 import {InjectRepository} from "@nestjs/typeorm";
 import {User} from "../users/user.entity";
 import {UsersService} from "../users/users.service";
-import {QuestionDto} from "../questions/dto/question.dto";
+import {QuestionDto, UpdateQuestionDto} from "../questions/dto/question.dto";
 import {QuestionsService} from "../questions/questions.service";
 
 @Injectable()
@@ -51,7 +51,6 @@ export class TemplatesService {
         if(!template) {
             throw new NotFoundException(`Template ${id} isn't exists`)
         }
-        console.log(template, user )
         if(template.author.id !== user.id) {
             throw new ForbiddenException(`You don't have permission`)
         }
@@ -87,23 +86,35 @@ export class TemplatesService {
 
     async createQuestion(user: User,templateId: number, questionDto: QuestionDto) {
         const template = await this.checkExistingAndPermission(templateId, user)
-        template.question = await this. questionsService.updateQuestions(template.question, questionDto)
+        const question = await this.questionsService.createQuestion(questionDto, template)
+        template[`${questionDto.type}Count`]++
         await this.templateRepository.save(template)
-        return template
+        return question
     }
 
     async createEmptyTemplate(user: User) {
         const template = this.templateRepository.create()
-        template.title = "Untitled"
-        template.description = "Description"
-        template.isPublic = false
-        template.question = await this.questionsService.initializeQuestionEntity()
         template.author = await this.userService.findUserById(user.id)
         await this.templateRepository.save(template)
         return {
             ...template,
             author: user
         }
+    }
+
+    async updateQuestion(user: User, id: number, dto: UpdateQuestionDto) {
+        const template = await this.checkExistingAndPermission(id, user);
+        return await this.questionsService.updateQuestion(template, dto)
+    }
+
+    async getTemplateWithQuestions(id: number, user: User) {
+        const template = await this.checkExistingAndPermission(id, user)
+        return await this.templateRepository.findOne({where: {id: template.id}, relations: ["questions"]})
+    }
+
+    async getAllQuestions(user: User, id: number) {
+        const {questions} = await this.getTemplateWithQuestions(id, user)
+        return questions
     }
 }
 

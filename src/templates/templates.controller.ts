@@ -15,7 +15,7 @@ import {TemplatesService} from "./templates.service";
 import TemplateDto, {UpdateTemplateDto} from "./dto/template.dto";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {IRequest} from "../types/request";
-import {QuestionDto} from "../questions/dto/question.dto";
+import {QuestionDto, UpdateQuestionDto} from "../questions/dto/question.dto";
 
 @Controller('templates')
 export class TemplatesController {
@@ -24,7 +24,7 @@ export class TemplatesController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Post("/create-empty")
+    @Post("/create")
     async createEmptyTemplate(@Request() req: IRequest) {
         return await this.templateService.createEmptyTemplate(req.user)
     }
@@ -58,6 +58,18 @@ export class TemplatesController {
     @Post("/create-question/:id")
     async createQuestion(@Param("id") id: number, @Request() req: IRequest, @Body() dto: QuestionDto) {
         return await this.templateService.createQuestion(req.user, id, dto)
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Patch("/update-question/:id")
+    async updateQuestion(@Param("id") id: number, @Request() req: IRequest, @Body() dto: UpdateQuestionDto) {
+        return await this.templateService.updateQuestion(req.user, id, dto)
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get("/all-questions/:id")
+    async getAllQuestions(@Param("id") id: number, @Request() req: IRequest) {
+        return await this.templateService.getAllQuestions(req.user, id)
     }
 }
 

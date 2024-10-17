@@ -1,9 +1,14 @@
-
+import {PartialType} from "@nestjs/swagger";
 
 export class QuestionDto {
-    index: number
     type: "int" | "string" | "text" | "checkbox"
-    question: string
+    title: string
+    description: string
     state?: boolean
     answers?: string[]
 }
+
+export class UpdateQuestionDto extends PartialType(QuestionDto) {
+    id: number
+}
+
