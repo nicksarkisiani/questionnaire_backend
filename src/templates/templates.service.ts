@@ -36,17 +36,19 @@ export class TemplatesService {
     }
 
     async getTemplate(id: number, user: User) {
-       const template = await this.checkExistingAndPermission(id, user)
+       const template = await this.checkExistingAndPermission(id, user, true)
         return {
             ...template,
             author: user
         }
     }
 
-    async checkExistingAndPermission(id: number, user: User) {
+    async checkExistingAndPermission(id: number, user: User, withQuestions = true) {
+        const relations = ["author", "tags", "topic"]
+        withQuestions && relations.push("questions")
         const template = await this.templateRepository.findOne({
             where: {id},
-            relations: ["author", "tags", "topic"]
+            relations: relations
         })
         if(!template) {
             throw new NotFoundException(`Template ${id} isn't exists`)
@@ -85,7 +87,7 @@ export class TemplatesService {
     }
 
     async createQuestion(user: User,templateId: number, questionDto: QuestionDto) {
-        const template = await this.checkExistingAndPermission(templateId, user)
+        const template = await this.checkExistingAndPermission(templateId, user, false)
         const question = await this.questionsService.createQuestion(questionDto, template)
         template[`${questionDto.type}Count`]++
         await this.templateRepository.save(template)
