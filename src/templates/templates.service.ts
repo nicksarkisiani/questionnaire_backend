@@ -13,6 +13,7 @@ import {User} from "../users/user.entity";
 import {UsersService} from "../users/users.service";
 import {QuestionDto, UpdateQuestionDto} from "../questions/dto/question.dto";
 import {QuestionsService} from "../questions/questions.service";
+import {TopicsService} from "../topics/topics.service";
 
 @Injectable()
 export class TemplatesService {
@@ -21,6 +22,7 @@ export class TemplatesService {
                 @InjectRepository(Template) private readonly templateRepository: Repository<Template>,
                 private readonly  userService: UsersService,
                 private readonly questionsService: QuestionsService,
+                private readonly topicsService: TopicsService,
     ) {}
 
     async uploadImageToCloudinary(file: Express.Multer.File) {
@@ -117,6 +119,12 @@ export class TemplatesService {
     async getAllQuestions(user: User, id: number) {
         const {questions} = await this.getTemplateWithQuestions(id, user)
         return questions
+    }
+
+    async updateTopic(user: User, templateId: number, topicId: number) {
+        const template = await this.checkExistingAndPermission(templateId, user)
+        template.topic = await this.topicsService.getTopicById(topicId)
+        return await this.templateRepository.save(template)
     }
 }
 

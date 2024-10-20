@@ -12,3 +12,7 @@ export class UpdateQuestionDto extends PartialType(QuestionDto) {
     id: number
 }
 
+export class UpdateTopicDto  {
+    id: number
+}
+

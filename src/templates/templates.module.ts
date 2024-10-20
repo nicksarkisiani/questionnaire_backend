@@ -6,13 +6,15 @@ import {Template} from "./template.entity";
 import {CloudinaryModule} from "../cloudinary/cloudinary.module";
 import {UsersModule} from "../users/users.module";
 import {QuestionsModule} from "../questions/questions.module";
+import {TopicsModule} from "../topics/topics.module";
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([Template]),
         CloudinaryModule,
         UsersModule,
-        QuestionsModule
+        QuestionsModule,
+        TopicsModule
     ],
     controllers: [TemplatesController],
     providers: [TemplatesService],

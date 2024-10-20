@@ -15,7 +15,7 @@ import {TemplatesService} from "./templates.service";
 import TemplateDto, {UpdateTemplateDto} from "./dto/template.dto";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {IRequest} from "../types/request";
-import {QuestionDto, UpdateQuestionDto} from "../questions/dto/question.dto";
+import {QuestionDto, UpdateQuestionDto, UpdateTopicDto} from "../questions/dto/question.dto";
 
 @Controller('templates')
 export class TemplatesController {
@@ -64,6 +64,12 @@ export class TemplatesController {
     @Patch("/update-question/:id")
     async updateQuestion(@Param("id") id: number, @Request() req: IRequest, @Body() dto: UpdateQuestionDto) {
         return await this.templateService.updateQuestion(req.user, id, dto)
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Patch("/update-topic/:id")
+    async updateTopic(@Param("id") id: number, @Request() req: IRequest, @Body() dto: UpdateTopicDto) {
+        return await this.templateService.updateTopic(req.user, id, dto.id)
     }
 
     @UseGuards(JwtAuthGuard)
