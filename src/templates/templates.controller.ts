@@ -8,14 +8,15 @@ import {
     UseGuards,
     UseInterceptors,
     Request,
-    Patch, Res
+    Patch, Res, Delete
 } from '@nestjs/common';
 import {FileInterceptor} from "@nestjs/platform-express";
 import {TemplatesService} from "./templates.service";
 import TemplateDto, {UpdateTemplateDto} from "./dto/template.dto";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {IRequest} from "../types/request";
-import {QuestionDto, UpdateQuestionDto, UpdateTopicDto} from "../questions/dto/question.dto";
+import {QuestionDto, UpdateQuestionDto} from "../questions/dto/question.dto";
+import {UpdateTopicDto} from "../topics/dto/topic.dto";
 
 @Controller('templates')
 export class TemplatesController {
@@ -76,6 +77,12 @@ export class TemplatesController {
     @Get("/all-questions/:id")
     async getAllQuestions(@Param("id") id: number, @Request() req: IRequest) {
         return await this.templateService.getAllQuestions(req.user, id)
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Delete("/delete-question/:id")
+    async deleteQuestion(@Param("id") id: number, @Request() req: IRequest, @Body() dto: UpdateQuestionDto) {
+        return await this.templateService.deleteQuestion(req.user, id, dto.id)
     }
 }
 

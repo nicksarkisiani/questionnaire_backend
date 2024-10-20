@@ -26,11 +26,15 @@ export class QuestionsService {
     }
 
     async updateQuestion(template: Template, dto: UpdateQuestionDto) {
-        const question = await this.findOneById(dto.id)
-        if (question.template.id !== template.id) throw new BadRequestException(`This question does not belong to template`)
+        const question = await this.checkBelongs(template, dto.id)
         Object.assign(question, {...dto, id: +dto.id})
         return await this.questionRepository.save(question);
+    }
 
+    async checkBelongs(template, questionId: number) {
+        const question = await this.findOneById(questionId)
+        if (question.template.id !== template.id) throw new BadRequestException(`This question does not belong to template`)
+        return question;
     }
 
     async findOneById(id: number) {
@@ -38,6 +42,12 @@ export class QuestionsService {
         const question = await this.questionRepository.findOne({relations: ["template"], where: {id: id}})
         if (!question) throw new BadRequestException(`Question with id ${id} does not exist`)
         return question
+    }
+
+    async deleteQuestion(template: Template,questionId: number) {
+        const question = await this.checkBelongs(template, questionId)
+        await this.questionRepository.delete(question.id)
+        return question;
     }
 }
 

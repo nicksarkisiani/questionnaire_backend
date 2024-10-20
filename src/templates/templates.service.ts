@@ -111,19 +111,22 @@ export class TemplatesService {
         return await this.questionsService.updateQuestion(template, dto)
     }
 
-    async getTemplateWithQuestions(id: number, user: User) {
-        const template = await this.checkExistingAndPermission(id, user)
-        return await this.templateRepository.findOne({where: {id: template.id}, relations: ["questions"]})
-    }
 
     async getAllQuestions(user: User, id: number) {
-        const {questions} = await this.getTemplateWithQuestions(id, user)
+        const {questions} = await this.checkExistingAndPermission(id, user)
         return questions
     }
 
     async updateTopic(user: User, templateId: number, topicId: number) {
         const template = await this.checkExistingAndPermission(templateId, user)
         template.topic = await this.topicsService.getTopicById(topicId)
+        return await this.templateRepository.save(template)
+    }
+
+    async deleteQuestion(user: User, templateId: number, questionId: number) {
+        const template = await this.checkExistingAndPermission(templateId, user);
+        const deletedQuestion = await this.questionsService.deleteQuestion(template, questionId)
+        template.questions = template.questions.filter(question => question.id !== deletedQuestion?.id)
         return await this.templateRepository.save(template)
     }
 }
