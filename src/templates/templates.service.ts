@@ -127,6 +127,7 @@ export class TemplatesService {
         const template = await this.checkExistingAndPermission(templateId, user);
         const deletedQuestion = await this.questionsService.deleteQuestion(template, questionId)
         template.questions = template.questions.filter(question => question.id !== deletedQuestion?.id)
+        template[`${deletedQuestion.type}Count`]--;
         return await this.templateRepository.save(template)
     }
 }
